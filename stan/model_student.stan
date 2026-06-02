@@ -1,6 +1,6 @@
 data {
   int<lower=0> N;
-  vector[N] y;                    // Nasze std_gross
+  vector[N] y;
   vector[N] is_pg13;
   vector[N] is_dark_genre;
   vector[N] budget;
@@ -19,7 +19,7 @@ model {
   b_pg13_dark ~ normal(0, 1); b_pg13_budget ~ normal(0, 1); b_dark_budget ~ normal(0, 1);
   b_triple ~ normal(0, 1);
   sigma ~ exponential(1);
-  nu ~ gamma(2, 0.1);
+  nu ~ gamma(2, 0.1);            
 
   vector[N] mu = alpha 
                  + b_pg13 * is_pg13 
