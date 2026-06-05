@@ -14,6 +14,7 @@ parameters {
 model {
   // Weakly informative priors
   // only the mean of alpha is informed by domain knowledge, while the other parameters are centered around zero with a standard deviation of 1, reflecting our uncertainty about their effects.
+  // https://pmc.ncbi.nlm.nih.gov/articles/PMC2929029/ - the found value is in the scale of 0-5 and the mean is around 3,57 but in our case the rating is from 0 to 10, so we can expect the mean to be around 6.5
   alpha ~ normal(6.5, 1.5);
   // regulizing priors - there is no strong prior belief about the direction or magnitude of the effects, but we want to prevent extreme values that could lead to overfitting.
   b_dark ~ normal(0, 1); 
