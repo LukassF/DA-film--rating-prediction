@@ -14,7 +14,9 @@ parameters {
 }
 model {
   // weakly informative priors
-  alpha ~ normal(0, 1);
+  // only the mean of alpha is informed by domain knowledge, while the other parameters are centered around zero with a standard deviation of 1, reflecting our uncertainty about their effects.
+  alpha ~ normal(6.5, 1.5);
+  // regulizing priors - there is no strong prior belief about the direction or magnitude of the effects, but we want to prevent extreme values that could lead to overfitting.
   b_pg13 ~ normal(0, 1); b_dark ~ normal(0, 1); b_budget ~ normal(0, 1);
   b_pg13_dark ~ normal(0, 1); b_pg13_budget ~ normal(0, 1); b_dark_budget ~ normal(0, 1);
   b_triple ~ normal(0, 1);
