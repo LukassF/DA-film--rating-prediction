@@ -16,7 +16,7 @@ model {
   alpha ~ normal(0, 1);
   // regulizing priors - there is no strong prior belief about the direction or magnitude of the effects, but we want to prevent extreme values that could lead to overfitting.
   b_dark ~ normal(0, 1); 
-  b_budget ~ normal(0, 1);
+  b_budget ~ normal(0.5, 0.5); // Assuming a positive effect of budget on revenue, but allowing for uncertainty
   b_dark_budget ~ normal(0, 1);
   sigma ~ exponential(1);
 

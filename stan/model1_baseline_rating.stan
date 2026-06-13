@@ -3,7 +3,17 @@ data {
   vector[N] y;
   vector[N] is_dark_genre;
   vector[N] budget;
+  vector[N] num_ratings;
 }
+
+// runs only once
+transformed data {
+  vector[N] inv_sqrt_ratings;
+  for (i in 1:N) {
+    inv_sqrt_ratings[i] = 1.0 / sqrt(num_ratings[i] + 0.001);
+  }
+}
+
 parameters {
   real alpha;
   real b_dark; 
@@ -11,6 +21,20 @@ parameters {
   real b_dark_budget;
   real<lower=0> sigma;
 }
+
+
+transformed parameters {
+  vector[N] mu;
+  vector[N] weighted_sigma;
+  
+  mu = alpha 
+    + b_dark * is_dark_genre 
+    + b_budget * budget 
+    + b_dark_budget * (is_dark_genre .* budget);
+
+  weighted_sigma = sigma * inv_sqrt_ratings;
+}
+
 model {
   // Weakly informative priors
   // only the mean of alpha is informed by domain knowledge, while the other parameters are centered around zero with a standard deviation of 1, reflecting our uncertainty about their effects.
@@ -22,19 +46,13 @@ model {
   b_dark_budget ~ normal(0, 1);
   sigma ~ exponential(1);
 
-  vector[N] mu = alpha 
-                 + b_dark * is_dark_genre 
-                 + b_budget * budget 
-                 + b_dark_budget * (is_dark_genre .* budget);
-
-  y ~ normal(mu, sigma);
+  y ~ normal(mu, weighted_sigma);
 }
 generated quantities {
   vector[N] log_lik;
   vector[N] y_rep; // Posterior predictive distribution
   for (n in 1:N) {
-    real mu_n = alpha + b_dark * is_dark_genre[n] + b_budget * budget[n] + b_dark_budget * is_dark_genre[n] * budget[n];
-    log_lik[n] = normal_lpdf(y[n] | mu_n, sigma);
-    y_rep[n] = normal_rng(mu_n, sigma);
+    log_lik[n] = normal_lpdf(y[n] | mu[n], weighted_sigma[n]);
+    y_rep[n] = normal_rng(mu[n], weighted_sigma[n]);
   }
 }
